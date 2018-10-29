@@ -20,7 +20,7 @@ const Schedule = loader.database.define('schedules', {
     type: Sequelize.INTEGER,
     allowNull: false
   },
-  updateAt: {
+  updatedAt: {
     type: Sequelize.DATE,
     allowNull: false
   }
