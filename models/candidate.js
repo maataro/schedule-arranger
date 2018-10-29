@@ -6,6 +6,7 @@ const Candidate = loader.database.define('candidates', {
   candidateId: {
     type: Sequelize.INTEGER,
     primaryKey: true,
+    autoIncrement: true,
     allowNull: false
   },
   candidateName: {

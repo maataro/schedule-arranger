@@ -45,6 +45,7 @@ passport.use(new GitHubStrategy ({
 },
   function (accessToken, refreshToken, profile, done) {
     process.nextTick(function () {
+      //  User モデルに対して、 取得されたユーザー ID とユーザー名を User のテーブルに保存
       User.upsert({
         userId: profile.id,
         username: profile.username

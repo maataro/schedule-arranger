@@ -8,7 +8,7 @@ const Availability = loader.database.define('availabilities', {
     primaryKey: true,
     allowNull: false
   },
-  userID: {
+  userId: {
     type: Sequelize.INTEGER,
     primaryKey: true,
     allowNull: false
