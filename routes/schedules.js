@@ -14,6 +14,7 @@ router.get('/new', authenticationEnsurer, (req, res, next) => {
 router.post('/', authenticationEnsurer, (req, res, next) => {
   const scheduleId = uuid.v4();
   const updatedAt = new Date();
+  // 予定をデータベース内に保存しているコード
   Schedule.create({
     scheduleId: scheduleId,
     scheduleName: req.body.scheduleName.slice(0, 255),
@@ -21,12 +22,16 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
     createdBy: req.user.id,
     updatedAt: updatedAt
   }).then((schedule) => {
-    const candidateNames = req.body.candidates.trim().split('\n').map((s) => s.trim()).filter((s) => s !== "");
+    // candidateNameもSTRING型で255文字までの制約があるので、slice(0, 255) を使って、制限文字数を超えた分をカットする
+    const candidateNames = req.body.candidates.trim().split('\n').map((s) => s.trim().slice(0, 255)).filter((s) => s !== "");
+    // 配列のそれぞれの要素からオブジェクトを作成、データベース内での各行のデータとなる
     const candidates = candidateNames.map((c) => { return {
       candidateName: c,
       scheduleId: schedule.scheduleId
     };});
+    // bulcCreate でcandidates 配列内のオブジェクトをまとめてデータベースに保存
     Candidate.bulkCreate(candidates).then(() => {
+      // データベースに保存後は、いま作成した予定の詳細ページにリダイレクト。/schedules/:scheduleId
       res.redirect('/schedules/' + schedule.scheduleId);
     });
   });
@@ -36,11 +41,11 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
   Schedule.findOne({
     include: [
       {
-        model: User,
-        atributes: ['userId', 'username']
+        model: User,                        // schedule.user というプロパティに、ユーザー情報が設定される
+        atributes: ['userId', 'username']   // Where句で絞り込まれた予定情報に関するユーザーIDとユーザー名
       }],
     where: {
-      scheduleId: req.params.scheduleId
+      scheduleId: req.params.scheduleId   // パラメータ :scheduleId の値を渡している
     },
     order: [['"updatedAt"', 'DESC']]
   }).then((schedule) => {

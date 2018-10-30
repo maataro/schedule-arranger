@@ -54,7 +54,8 @@ describe('/schedules', () => {
   });
 
   it('予定が作成でき、表示される', (done) => {
-    User.upsert({ userId: 0, username: 'testuser' }).then(() => {
+    // // schedules.js での処理にusersテーブルの予定作成ユーザーの情報を取得するため、データベース上にデータを作成しておく
+    User.upsert({ userId: 0, username: 'testuser' }).then(() => {   
       request(app)
         .post('/schedules')
         .send({ scheduleName: 'テスト予定1', memo: 'テストメモ1\r\nテストメモ2', candidates: 'テスト候補1\r\nテスト候補2\r\nテスト候補3' })
