@@ -55,6 +55,7 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
         where: { scheduleId: schedule.scheduleId },
         order: [['"candidateId"', 'ASC']]
       }).then((candidates) => {
+        // データベースからその予定のすべての出欠を取得する
         Availability.findAll({
           include: [
             {
@@ -95,9 +96,9 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
               const map = availabilityMapMap.get(u.userId) || new Map();
               const a = map.get(c.candidateId) || 0;  // デフォルト値は 0 を利用
               map.set(c.candidateId, a);
-              availabilityMapMap.set(u.userId, map)
-            })
-          })
+              availabilityMapMap.set(u.userId, map);
+            });
+          });
 
           
 
