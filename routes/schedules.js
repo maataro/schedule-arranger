@@ -66,7 +66,8 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
           where: { scheduleId: schedule.scheduleId },
           order: [[User, 'username', 'ASC'], ['"candidateId"', 'ASC']]
         }).then((availabilities) => {
-          // 出欠 MapMap(キー:ユーザーID、値:出欠Map(キー：候補ID,　値：出欠)) を作成する
+          // 出欠 MapMap(キー:ユーザーID、値:出欠Map(キー：候補ID,　値：出欠)) を作成する         
+          // データベース　出欠テーブルに存在する出欠情報（ユーザーID,候補ID,出欠）をマップにセットする
           const availabilityMapMap = new Map(); // key: userId, value: Map(key: candidateId, value: availability)
           availabilities.forEach((a) => {
             const map = availabilityMapMap.get(a.user.userId) || new Map();
@@ -75,6 +76,7 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
           });
 
           // 閲覧ユーザーと出欠に紐づくユーザーからユーザー Map（キー：ユーザーID, 値：ユーザー）を作る
+          // 出欠のデータを一つでも持っていたユーザーをユーザー、または閲覧ユーザーをユーザーMapに含める
           const userMap = new Map();  // key: userId, value: User
           userMap.set(parseInt(req.user.id), {
             isSelf: true,
@@ -89,7 +91,8 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
             });
           });
 
-          // 全ユーザー、全候補で二重ループしてそれぞれの出欠の値がない場合には、「欠席」を設定する
+          // 全ユーザー、"全候補" で二重ループしてそれぞれの出欠の値がない場合には、「欠席」を設定する
+          // 回答していない候補に対する出欠情報を "欠" としてセットする
           const users = Array.from(userMap).map((keyValue) => keyValue[1]);
           users.forEach((u) => {
             candidates.forEach((c) => {
