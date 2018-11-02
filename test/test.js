@@ -171,27 +171,28 @@ describe('/schedules/:scheduleId/users/:userId/comments', () => {
 
 
 function deleteScheduleAggregate(scheduleId, done, err) {
-  // 簡単に実装するために、ここでは、コメントだけを独立して削除
-  // テストの実行状況によっては、予定が存在しないコメントが残ってしまう可能性があるため、後で修正
   const promiseCommentDestroy = Comment.findAll({
     where: { scheduleId: scheduleId }
-  }).then((comments) => { comments.map((c) => { return c.destroy(); });});
+  }).then((comments) => {
+    return Promise.all(comments.map((c) => { return c.destroy(); }));
+  });
 
   Availability.findAll({
-    where: { scheduleId: scheduleId }    
+    where: { scheduleId: scheduleId }
   }).then((availabilities) => {
     const promises = availabilities.map((a) => { return a.destroy(); });
-    Promise.all(promises).then(() => {
-      Candidate.findAll({
-        where: { scheduleId: scheduleId }
-      }).then((candidates) => {
-        const promises = candidates.map((c) => { return c.destroy(); });
-        Promise.all(promises).then(() => {
-          Schedule.findById(scheduleId).then((s) => { s.destroy(); });
-          if (err) return done(err);
-          done();
-        });
-      });
+    return Promise.all(promises);
+  }).then(() => {
+    return Candidate.findAll({
+      where: { scheduleId: scheduleId }
     });
+  }).then((candidates) => {
+    const promises = candidates.map((c) => { return c.destroy(); });
+    promises.push(promiseCommentDestroy);
+    return Promise.all(promises);
+  }).then(() => {
+    Schedule.findById(scheduleId).then((s) => { s.destroy(); });
+    if (err) return done(err);
+    done();
   });
 }
