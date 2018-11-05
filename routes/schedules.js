@@ -174,7 +174,7 @@ router.post('/:scheduleId', authenticationEnsurer, (req, res, next) => {
             order: [['"candidateId"', 'ASC']]
           }).then((candidates) => {
             // 追加されているかチェック
-            const candidateNames = parseCandidateNames(req);
+            const candidateNames = parseCandidateNames(req);  // リクエストのボディから新たな候補を取得
             if (candidateNames) {
               createCandidatesAndRedirect(candidateNames, schedule.scheduleId, res);
             } else {
@@ -229,6 +229,7 @@ function deleteScheduleAggregate(scheduleId, done, err) {
 
 router.deleteScheduleAggregate = deleteScheduleAggregate;
 
+// 候補日程の配列、予定 ID 、レスポンスオブジェクトを受け取り、候補の作成とリダイレクトを行う
 function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
   // 配列のそれぞれの要素からオブジェクトを作成、データベース内での各行のデータとなる
   const candidates = candidateNames.map((c) => {
@@ -244,6 +245,7 @@ function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
   });
 }
 
+// リクエストから候補日程の配列をパースする関数で候補日程の配列が得られる
 function parseCandidateNames(req) {
   return req.body.candidates.trim().split('\n').map((s) => s.trim()).filter((s) => s !== "");
 }
