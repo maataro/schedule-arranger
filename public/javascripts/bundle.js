@@ -10467,6 +10467,10 @@ global.jQuery = _jquery2.default;
       button.data('availability', data.availability); // 実行結果を受け取って button 要素の、 data-* 属性を更新
       var availabilityLabels = ['欠', '？', '出'];
       button.text(availabilityLabels[data.availability]); // ボタンのラベルを更新
+
+      var buttonStyles = ['btn-danger', 'btn-secondary', 'btn-success'];
+      button.removeClass('btn-danger btn-secondary btn-success');
+      button.addClass(buttonStyles[data.availability]);
     });
   });
 });

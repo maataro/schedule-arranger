@@ -18,6 +18,10 @@ $('.availability-toggle-button').each((i, e) => {
         button.data('availability', data.availability);  // 実行結果を受け取って button 要素の、 data-* 属性を更新
         const availabilityLabels = ['欠', '？', '出'];
         button.text(availabilityLabels[data.availability]);  // ボタンのラベルを更新
+
+        const buttonStyles = ['btn-danger', 'btn-secondary', 'btn-success'];
+        button.removeClass('btn-danger btn-secondary btn-success');
+        button.addClass(buttonStyles[data.availability]);
       });
   });
 });
